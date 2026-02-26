@@ -1,0 +1,24 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-terminal-bg: #0a0e0f;
+  --color-terminal-surface: #11181c;
+  --color-terminal-border: #1e2a30;
+  --color-terminal-muted: #5c6b73;
+  --color-terminal-green: #00c853;
+  --color-terminal-amber: #ffab00;
+  --color-terminal-red: #ff5252;
+}
+
+html {
+  @apply antialiased;
+}
+
+body {
+  @apply bg-terminal-bg text-gray-100 min-h-screen;
+}
+
+body.dark,
+html.dark {
+  color-scheme: dark;
+}
