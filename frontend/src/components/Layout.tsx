@@ -5,7 +5,7 @@ import { HedgeSimulator } from './HedgeSimulator'
 import { HistoryPanel } from './HistoryPanel'
 import { CardSkeleton } from './ui/LoadingSkeleton'
 import { ErrorBanner } from './ui/ErrorBanner'
-import type { Flight, History } from '../api/client'
+import type { Flight, History, Market, DataSource } from '../api/client'
 
 interface LayoutProps {
   ident: string
@@ -15,10 +15,14 @@ interface LayoutProps {
   onSearch: (ident: string, date: string) => void
   flight: Flight | null
   history: History | null
+  market: Market | null
+  dataSource: DataSource
   loading: boolean
   error: string | null
   onDismissError: () => void
   demoMode: boolean
+  lastFetchedAt: number | null
+  probabilityFlash: boolean
 }
 
 export function Layout({
@@ -29,10 +33,14 @@ export function Layout({
   onSearch,
   flight,
   history,
+  market,
+  dataSource,
   loading,
   error,
   onDismissError,
   demoMode,
+  lastFetchedAt,
+  probabilityFlash,
 }: LayoutProps) {
   return (
     <div className="relative min-h-screen">
@@ -72,9 +80,17 @@ export function Layout({
           </div>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2">
-            <StatusCard flight={flight} />
-            <ProbabilityCard prediction={flight?.prediction ?? null} />
-            <HedgeSimulator pDelay30={flight?.prediction?.p_delay_30 ?? null} />
+            <StatusCard flight={flight} lastFetchedAt={lastFetchedAt} />
+            <ProbabilityCard
+              prediction={flight?.prediction ?? null}
+              dataSource={dataSource}
+              flash={probabilityFlash}
+            />
+            <HedgeSimulator
+              pDelay30={flight?.prediction?.p_delay_30 ?? null}
+              market={market}
+              lastFetchedAt={lastFetchedAt}
+            />
             <HistoryPanel history={history} />
           </div>
         )}

@@ -7,9 +7,13 @@ function App() {
     date,
     flight,
     history,
+    market,
+    dataSource,
     loading,
     error,
     demoMode,
+    lastFetchedAt,
+    probabilityFlash,
     search,
     setIdent,
     setDate,
@@ -25,10 +29,14 @@ function App() {
       onSearch={search}
       flight={flight}
       history={history}
+      market={market}
+      dataSource={dataSource}
       loading={loading}
       error={error}
       onDismissError={clearError}
       demoMode={demoMode}
+      lastFetchedAt={lastFetchedAt}
+      probabilityFlash={probabilityFlash}
     />
   )
 }
