@@ -1,5 +1,4 @@
 import type { Flight } from '../api/client'
-import { LastUpdated } from './ui/LastUpdated'
 
 const STATUS_LABELS: Record<string, string> = {
   ON_TIME: 'On Time',
@@ -28,10 +27,9 @@ function formatTime(iso: string): string {
 
 interface StatusCardProps {
   flight: Flight | null
-  lastFetchedAt?: number | null
 }
 
-export function StatusCard({ flight, lastFetchedAt }: StatusCardProps) {
+export function StatusCard({ flight }: StatusCardProps) {
   if (!flight) {
     return (
       <div className="rounded-lg border border-terminal-border bg-terminal-surface p-5">
@@ -78,11 +76,6 @@ export function StatusCard({ flight, lastFetchedAt }: StatusCardProps) {
       <p className="mt-2 text-xs text-terminal-muted">
         {flight.airline} · {flight.origin} → {flight.destination}
       </p>
-      {lastFetchedAt != null && (
-        <p className="mt-1">
-          <LastUpdated lastFetchedAt={lastFetchedAt} />
-        </p>
-      )}
     </div>
   )
 }

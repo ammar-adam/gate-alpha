@@ -7,8 +7,10 @@ const EXAMPLE_FLIGHTS = [
 interface SearchBarProps {
   ident: string
   date: string
+  mode: 'live' | 'demo'
   onIdentChange: (v: string) => void
   onDateChange: (v: string) => void
+  onModeChange: (m: 'live' | 'demo') => void
   onSearch: (ident: string, date: string) => void
   loading?: boolean
 }
@@ -16,8 +18,10 @@ interface SearchBarProps {
 export function SearchBar({
   ident,
   date,
+  mode,
   onIdentChange,
   onDateChange,
+  onModeChange,
   onSearch,
   loading = false,
 }: SearchBarProps) {
@@ -34,6 +38,31 @@ export function SearchBar({
 
   return (
     <div className="w-full">
+      <div className="mb-3 flex flex-wrap items-center gap-3">
+        <span className="text-xs text-terminal-muted">Data:</span>
+        <button
+          type="button"
+          onClick={() => onModeChange('demo')}
+          className={`rounded px-2.5 py-1 text-xs font-medium ${
+            mode === 'demo'
+              ? 'bg-terminal-amber text-terminal-bg'
+              : 'border border-terminal-border text-terminal-muted'
+          }`}
+        >
+          DEMO
+        </button>
+        <button
+          type="button"
+          onClick={() => onModeChange('live')}
+          className={`rounded px-2.5 py-1 text-xs font-medium ${
+            mode === 'live'
+              ? 'bg-terminal-green text-terminal-bg'
+              : 'border border-terminal-border text-terminal-muted'
+          }`}
+        >
+          LIVE
+        </button>
+      </div>
       <form onSubmit={handleSubmit} className="flex flex-wrap items-end gap-3">
         <label className="flex flex-col gap-1">
           <span className="text-sm text-terminal-muted">Flight number</span>
@@ -77,7 +106,15 @@ export function SearchBar({
             <span className="mx-1.5 text-terminal-muted">|</span>
             <span>{ex.date}</span>
             <span className="mx-1.5 text-terminal-muted">|</span>
-            <span className={ex.status === 'DELAYED' ? 'text-terminal-amber' : ex.status === 'CANCELLED' ? 'text-terminal-red' : 'text-terminal-green'}>
+            <span
+              className={
+                ex.status === 'DELAYED'
+                  ? 'text-terminal-amber'
+                  : ex.status === 'CANCELLED'
+                    ? 'text-terminal-red'
+                    : 'text-terminal-green'
+              }
+            >
               {ex.status}
             </span>
           </button>

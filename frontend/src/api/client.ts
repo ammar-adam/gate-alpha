@@ -6,8 +6,7 @@ export type FlightStatus =
   | 'UNKNOWN'
 
 export interface Prediction {
-  p_delay_30: number
-  p_mkt: number
+  p_model_delay_30: number
   confidence: string
   reason_codes: string[]
 }
@@ -43,54 +42,48 @@ export interface History {
   period: string
 }
 
-export interface OrderbookLevel {
-  price: number
-  size: number
-}
-
-export interface Market {
-  yes_best_ask: number
-  yes_best_bid: number
-  no_best_ask: number
-  no_best_bid: number
-  yes_levels: OrderbookLevel[]
-  no_levels: OrderbookLevel[]
-  last_trade_price: number
-  volume_24h: number
-  open_interest: number
-}
-
-export type DataSource = 'live' | 'mock'
+export type DataSource = 'live' | 'demo'
 
 const BASE = '/api'
 
 async function getJson<T>(url: string): Promise<T> {
   const res = await fetch(url)
   if (!res.ok) {
-    const text = await res.text()
-    throw new Error(text || `HTTP ${res.status}`)
+    let msg = `Request failed`
+    try {
+      const t = await res.text()
+      if (t && t.length < 200) msg = t
+      else if (res.status) msg = `Error ${res.status}`
+    } catch {
+      msg = `Error ${res.status}`
+    }
+    throw new Error(msg)
   }
   return res.json() as Promise<T>
 }
 
 export async function getFlight(
   ident: string,
-  date: string
+  date: string,
+  mode: 'live' | 'demo' = 'demo'
 ): Promise<{ flight: Flight; dataSource: DataSource }> {
-  const params = new URLSearchParams({ ident: ident.trim(), date: date.trim() })
+  const params = new URLSearchParams({
+    ident: ident.trim(),
+    date: date.trim().slice(0, 10),
+    mode: mode === 'live' ? 'live' : 'demo',
+  })
   const res = await fetch(`${BASE}/flight?${params}`)
   if (!res.ok) {
-    const text = await res.text()
-    throw new Error(text || `HTTP ${res.status}`)
+    let msg = `Flight lookup failed`
+    try {
+      const t = await res.text()
+      if (t && t.length < 200) msg = t
+    } catch {}
+    throw new Error(msg)
   }
-  const dataSource = (res.headers.get('X-Data-Source') ?? 'mock') as DataSource
+  const dataSource = (res.headers.get('X-Data-Source') ?? 'demo') as DataSource
   const flight = (await res.json()) as Flight
   return { flight, dataSource }
-}
-
-export function getMarket(ident: string, date: string): Promise<Market> {
-  const params = new URLSearchParams({ ident: ident.trim(), date: date.trim() })
-  return getJson<Market>(`${BASE}/market?${params}`)
 }
 
 export function getHistory(

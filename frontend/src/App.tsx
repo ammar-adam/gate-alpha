@@ -7,16 +7,14 @@ function App() {
     date,
     flight,
     history,
-    market,
     dataSource,
+    mode,
     loading,
     error,
-    demoMode,
-    lastFetchedAt,
-    probabilityFlash,
     search,
     setIdent,
     setDate,
+    setMode,
     clearError,
   } = useFlightSearch()
 
@@ -24,19 +22,17 @@ function App() {
     <Layout
       ident={ident}
       date={date}
+      mode={mode}
       onIdentChange={setIdent}
       onDateChange={setDate}
+      onModeChange={setMode}
       onSearch={search}
       flight={flight}
       history={history}
-      market={market}
       dataSource={dataSource}
       loading={loading}
       error={error}
       onDismissError={clearError}
-      demoMode={demoMode}
-      lastFetchedAt={lastFetchedAt}
-      probabilityFlash={probabilityFlash}
     />
   )
 }

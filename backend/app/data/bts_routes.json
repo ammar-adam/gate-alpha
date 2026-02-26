@@ -1,0 +1,98 @@
+{
+  "EWR-BTV-UA": {
+    "on_time_pct": 0.72,
+    "delay_15_pct": 0.21,
+    "delay_30_pct": 0.14,
+    "cancel_pct": 0.03,
+    "sample_size": 842,
+    "period": "2024-01 to 2024-12"
+  },
+  "YYZ-YVR-AC": {
+    "on_time_pct": 0.81,
+    "delay_15_pct": 0.14,
+    "delay_30_pct": 0.08,
+    "cancel_pct": 0.02,
+    "sample_size": 1204,
+    "period": "2024-01 to 2024-12"
+  },
+  "JFK-LAX-DL": {
+    "on_time_pct": 0.68,
+    "delay_15_pct": 0.24,
+    "delay_30_pct": 0.12,
+    "cancel_pct": 0.05,
+    "sample_size": 2156,
+    "period": "2024-01 to 2024-12"
+  },
+  "ORD-DEN-UA": {
+    "on_time_pct": 0.74,
+    "delay_15_pct": 0.19,
+    "delay_30_pct": 0.11,
+    "cancel_pct": 0.04,
+    "sample_size": 1892,
+    "period": "2024-01 to 2024-12"
+  },
+  "ATL-LGA-DL": {
+    "on_time_pct": 0.70,
+    "delay_15_pct": 0.22,
+    "delay_30_pct": 0.13,
+    "cancel_pct": 0.04,
+    "sample_size": 3200,
+    "period": "2024-01 to 2024-12"
+  },
+  "LAX-SFO-UA": {
+    "on_time_pct": 0.76,
+    "delay_15_pct": 0.18,
+    "delay_30_pct": 0.10,
+    "cancel_pct": 0.02,
+    "sample_size": 4100,
+    "period": "2024-01 to 2024-12"
+  },
+  "BOS-MIA-B6": {
+    "on_time_pct": 0.71,
+    "delay_15_pct": 0.21,
+    "delay_30_pct": 0.12,
+    "cancel_pct": 0.05,
+    "sample_size": 756,
+    "period": "2024-01 to 2024-12"
+  },
+  "DFW-ORD-AA": {
+    "on_time_pct": 0.73,
+    "delay_15_pct": 0.20,
+    "delay_30_pct": 0.11,
+    "cancel_pct": 0.03,
+    "sample_size": 1650,
+    "period": "2024-01 to 2024-12"
+  },
+  "SEA-PHX-AS": {
+    "on_time_pct": 0.79,
+    "delay_15_pct": 0.15,
+    "delay_30_pct": 0.08,
+    "cancel_pct": 0.02,
+    "sample_size": 920,
+    "period": "2024-01 to 2024-12"
+  },
+  "MCO-EWR-WN": {
+    "on_time_pct": 0.69,
+    "delay_15_pct": 0.23,
+    "delay_30_pct": 0.14,
+    "cancel_pct": 0.05,
+    "sample_size": 1100,
+    "period": "2024-01 to 2024-12"
+  },
+  "JFK-LAX-AA": {
+    "on_time_pct": 0.67,
+    "delay_15_pct": 0.25,
+    "delay_30_pct": 0.14,
+    "cancel_pct": 0.05,
+    "sample_size": 980,
+    "period": "2024-01 to 2024-12"
+  },
+  "DEN-PHX-UA": {
+    "on_time_pct": 0.75,
+    "delay_15_pct": 0.18,
+    "delay_30_pct": 0.10,
+    "cancel_pct": 0.03,
+    "sample_size": 1340,
+    "period": "2024-01 to 2024-12"
+  }
+}

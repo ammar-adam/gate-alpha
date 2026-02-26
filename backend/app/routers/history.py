@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Query
 
 from app.models.schemas import HistoryResponse
-from app.services.mock_history import get_history
+from app.services.bts_history import get_history
 
 router = APIRouter(prefix="/history", tags=["history"])
 

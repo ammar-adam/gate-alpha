@@ -1,15 +1,5 @@
-import { useState, useCallback, useEffect, useRef } from 'react'
-import {
-  getFlight,
-  getHistory,
-  getMarket,
-  type Flight,
-  type History,
-  type Market,
-  type DataSource,
-} from '../api/client'
-
-const POLL_INTERVAL_MS = 60_000
+import { useState, useCallback } from 'react'
+import { getFlight, getHistory, type Flight, type History, type DataSource } from '../api/client'
 
 const DEMO_IDENT = 'UA4469'
 const DEMO_DATE = '2026-02-25'
@@ -27,8 +17,7 @@ const DEMO_FLIGHT: Flight = {
   delay_minutes: 47,
   last_updated: '2026-02-25T08:12:00Z',
   prediction: {
-    p_delay_30: 0.67,
-    p_mkt: 0.59,
+    p_model_delay_30: 0.67,
     confidence: 'MED',
     reason_codes: ['LATE_INBOUND', 'AIRPORT_CONGESTION'],
   },
@@ -40,7 +29,7 @@ const DEMO_HISTORY: History = {
   carrier: 'UA',
   stats: { on_time_pct: 0.72, delay_15_pct: 0.21, delay_30_pct: 0.14, cancel_pct: 0.03 },
   sample_size: 842,
-  period: '2025-01 to 2025-12',
+  period: '2024-01 to 2024-12',
 }
 
 export interface UseFlightSearchState {
@@ -48,13 +37,10 @@ export interface UseFlightSearchState {
   date: string
   flight: Flight | null
   history: History | null
-  market: Market | null
   dataSource: DataSource
+  mode: 'live' | 'demo'
   loading: boolean
   error: string | null
-  demoMode: boolean
-  lastFetchedAt: number | null
-  probabilityFlash: boolean
 }
 
 export function useFlightSearch() {
@@ -62,97 +48,51 @@ export function useFlightSearch() {
   const [date, setDate] = useState('')
   const [flight, setFlight] = useState<Flight | null>(null)
   const [history, setHistory] = useState<History | null>(null)
-  const [market, setMarket] = useState<Market | null>(null)
-  const [dataSource, setDataSource] = useState<DataSource>('mock')
+  const [dataSource, setDataSource] = useState<DataSource>('demo')
+  const [mode, setMode] = useState<'live' | 'demo'>('demo')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [demoMode, setDemoMode] = useState(false)
-  const [lastFetchedAt, setLastFetchedAt] = useState<number | null>(null)
-  const [probabilityFlash, setProbabilityFlash] = useState(false)
-  const prevPRef = useRef<number | null>(null)
 
-  const refreshFlight = useCallback(async (i: string, d: string) => {
-    try {
-      const { flight: f, dataSource: ds } = await getFlight(i, d)
-      const prevP = prevPRef.current
-      prevPRef.current = f.prediction.p_delay_30
-      if (prevP != null && Math.abs(prevP - f.prediction.p_delay_30) > 0.001) {
-        setProbabilityFlash(true)
-        setTimeout(() => setProbabilityFlash(false), 1500)
-      }
-      setFlight(f)
-      setDataSource(ds)
-      setLastFetchedAt(Date.now())
+  const search = useCallback(
+    async (searchIdent: string, searchDate: string) => {
+      const i = searchIdent.trim()
+      const d = searchDate.trim().slice(0, 10)
+      if (!i || !d) return
+      setLoading(true)
+      setError(null)
       try {
-        const m = await getMarket(i, d)
-        setMarket(m)
-      } catch {
-        setMarket(null)
+        const { flight: f, dataSource: ds } = await getFlight(i, d, mode)
+        setFlight(f)
+        setDataSource(ds)
+        setIdent(i)
+        setDate(d)
+        try {
+          const h = await getHistory(f.origin, f.destination, f.carrier_code)
+          setHistory(h)
+        } catch {
+          setHistory({
+            origin: f.origin,
+            destination: f.destination,
+            carrier: f.carrier_code,
+            stats: { on_time_pct: 0, delay_15_pct: 0, delay_30_pct: 0, cancel_pct: 0 },
+            sample_size: 0,
+            period: '—',
+          })
+        }
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Search failed'
+        setError(message)
+        setFlight(DEMO_FLIGHT)
+        setHistory(DEMO_HISTORY)
+        setDataSource('demo')
+        setIdent(DEMO_IDENT)
+        setDate(DEMO_DATE)
+      } finally {
+        setLoading(false)
       }
-    } catch {
-      // keep existing data on poll failure
-    }
-  }, [])
-
-  useEffect(() => {
-    if (!ident || !date || !flight || flight.status === 'CANCELLED' || demoMode) return
-    const id = setInterval(() => refreshFlight(ident, date), POLL_INTERVAL_MS)
-    return () => clearInterval(id)
-  }, [ident, date, flight?.status, demoMode, refreshFlight])
-
-  const search = useCallback(async (searchIdent: string, searchDate: string) => {
-    const i = searchIdent.trim()
-    const d = searchDate.trim()
-    if (!i || !d) return
-    setLoading(true)
-    setError(null)
-    setDemoMode(false)
-    try {
-      const { flight: f, dataSource: ds } = await getFlight(i, d)
-      setFlight(f)
-      setDataSource(ds)
-      setIdent(i)
-      setDate(d)
-      setLastFetchedAt(Date.now())
-      prevPRef.current = f.prediction.p_delay_30
-      try {
-        const h = await getHistory(f.origin, f.destination, f.carrier_code)
-        setHistory(h)
-      } catch {
-        setHistory({
-          origin: f.origin,
-          destination: f.destination,
-          carrier: f.carrier_code,
-          stats: {
-            on_time_pct: 0,
-            delay_15_pct: 0,
-            delay_30_pct: 0,
-            cancel_pct: 0,
-          },
-          sample_size: 0,
-          period: '—',
-        })
-      }
-      try {
-        const m = await getMarket(i, d)
-        setMarket(m)
-      } catch {
-        setMarket(null)
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Search failed')
-      setDemoMode(true)
-      setFlight(DEMO_FLIGHT)
-      setHistory(DEMO_HISTORY)
-      setDataSource('mock')
-      setMarket(null)
-      setLastFetchedAt(null)
-      setIdent(DEMO_IDENT)
-      setDate(DEMO_DATE)
-    } finally {
-      setLoading(false)
-    }
-  }, [])
+    },
+    [mode]
+  )
 
   const clearError = useCallback(() => setError(null), [])
 
@@ -161,16 +101,14 @@ export function useFlightSearch() {
     date,
     flight,
     history,
-    market,
     dataSource,
+    mode,
     loading,
     error,
-    demoMode,
-    lastFetchedAt,
-    probabilityFlash,
     search,
     setIdent,
     setDate,
+    setMode,
     clearError,
   }
 }
