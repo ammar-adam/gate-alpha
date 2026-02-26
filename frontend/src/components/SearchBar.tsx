@@ -1,3 +1,5 @@
+import type { SearchResultItem } from '../api/client'
+
 const EXAMPLE_FLIGHTS = [
   { ident: 'UA4469', route: 'EWR → BTV', date: '2026-02-25', status: 'DELAYED' },
   { ident: 'AC123', route: 'YYZ → YVR', date: '2026-02-25', status: 'ON_TIME' },
@@ -13,6 +15,10 @@ interface SearchBarProps {
   onModeChange: (m: 'live' | 'demo') => void
   onSearch: (ident: string, date: string) => void
   loading?: boolean
+  searchQuery?: string
+  onSearchQueryChange?: (v: string) => void
+  searchResults?: SearchResultItem[]
+  onSelectSearchResult?: (ident: string) => void
 }
 
 export function SearchBar({
@@ -24,6 +30,10 @@ export function SearchBar({
   onModeChange,
   onSearch,
   loading = false,
+  searchQuery = '',
+  onSearchQueryChange,
+  searchResults = [],
+  onSelectSearchResult,
 }: SearchBarProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -35,6 +45,10 @@ export function SearchBar({
     onDateChange(chipDate)
     onSearch(chipIdent, chipDate)
   }
+
+  const showDropdown = Boolean(
+    onSearchQueryChange && searchResults.length > 0 && searchQuery.trim()
+  )
 
   return (
     <div className="w-full">
@@ -63,6 +77,35 @@ export function SearchBar({
           LIVE
         </button>
       </div>
+      {onSearchQueryChange && (
+        <div className="relative mb-3">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => onSearchQueryChange(e.target.value)}
+            placeholder="Search by flight, route, airline…"
+            className="w-full max-w-md rounded border border-terminal-border bg-terminal-surface px-3 py-2 text-white placeholder:text-terminal-muted focus:border-terminal-amber focus:outline-none"
+          />
+          {showDropdown && (
+            <ul className="absolute left-0 top-full z-10 mt-1 max-h-60 w-full max-w-md overflow-auto rounded border border-terminal-border bg-terminal-surface py-1">
+              {searchResults.map((r) => (
+                <li key={`${r.ident}-${r.route}`}>
+                  <button
+                    type="button"
+                    onClick={() => onSelectSearchResult?.(r.ident)}
+                    className="w-full px-3 py-2 text-left text-sm hover:bg-terminal-border"
+                  >
+                    <span className="font-mono font-semibold">{r.ident}</span>
+                    <span className="mx-2 text-terminal-muted">{r.route}</span>
+                    <span className="text-terminal-muted">{r.status}</span>
+                    <span className="ml-2 text-terminal-muted">{r.departure_time}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
       <form onSubmit={handleSubmit} className="flex flex-wrap items-end gap-3">
         <label className="flex flex-col gap-1">
           <span className="text-sm text-terminal-muted">Flight number</span>

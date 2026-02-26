@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routers import flight, history
+from app.routers import flight, history, search
 
 app = FastAPI(title="GateAlpha API", version="0.1.0")
 
@@ -11,10 +11,12 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["X-Data-Source"],
 )
 
 app.include_router(flight.router, prefix="/api")
 app.include_router(history.router, prefix="/api")
+app.include_router(search.router, prefix="/api")
 
 
 @app.get("/")

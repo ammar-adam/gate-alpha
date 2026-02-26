@@ -3,8 +3,13 @@ from app.models.schemas import FlightResponse, FlightStatus, PredictionSchema
 _MOCK_BY_KEY: dict[tuple[str, str], FlightResponse] = {}
 
 
+def _clamp(x: float, lo: float, hi: float) -> float:
+    return max(lo, min(hi, x))
+
+
 def _pred(p: float, conf: str, codes: list[str]) -> PredictionSchema:
-    return PredictionSchema(p_model_delay_30=p, confidence=conf, reason_codes=codes)
+    p_mkt = _clamp(p - 0.08, 0.05, 0.95)
+    return PredictionSchema(p_model_delay_30=p, p_mkt=p_mkt, confidence=conf, reason_codes=codes)
 
 
 def _make_demos() -> None:

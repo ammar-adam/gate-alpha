@@ -85,8 +85,10 @@ def _normalize(record: dict[str, Any], history_delay_30_pct: float, sample_size:
         p_model, confidence, reason_codes = _p_model_heuristic(
             delay_minutes, history_delay_30_pct, status, has_live, sample_size
         )
+        p_mkt = _clamp(p_model - 0.08, 0.05, 0.95)
         prediction = PredictionSchema(
             p_model_delay_30=p_model,
+            p_mkt=p_mkt,
             confidence=confidence,
             reason_codes=reason_codes,
         )

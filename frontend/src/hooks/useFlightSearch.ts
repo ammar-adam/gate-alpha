@@ -18,6 +18,7 @@ const DEMO_FLIGHT: Flight = {
   last_updated: '2026-02-25T08:12:00Z',
   prediction: {
     p_model_delay_30: 0.67,
+    p_mkt: 0.59,
     confidence: 'MED',
     reason_codes: ['LATE_INBOUND', 'AIRPORT_CONGESTION'],
   },
@@ -80,8 +81,8 @@ export function useFlightSearch() {
           })
         }
       } catch (err) {
-        const message = err instanceof Error ? err.message : 'Search failed'
-        setError(message)
+        const message = err instanceof Error ? err.message : 'ERROR'
+        setError(message === 'NOT_FOUND' ? 'Flight not found · showing demo data' : 'Something went wrong · showing demo data')
         setFlight(DEMO_FLIGHT)
         setHistory(DEMO_HISTORY)
         setDataSource('demo')

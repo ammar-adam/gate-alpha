@@ -29,3 +29,12 @@ Decisions made where the PRD/TECH_SPEC did not specify.
 
 - **Branding**: "GateAlpha" in title, header, and README; no TaxiHedge/GateGuard.
 - **Disclaimer**: Single footer line: "Hypothetical simulation. Not financial advice. No real trading."
+
+## Explicitly out of scope
+
+- **Real database**: No PostgreSQL/MySQL; mock and in-memory only.
+- **Real auth**: No JWT, sessions, or OAuth; frontend-only "name" for greeting.
+- **Real money / Kalshi**: Simulation only; no real trading or Kalshi integration.
+- **Mobile app**: Web only; no native iOS/Android.
+- **Persistent user accounts**: No sign-up or stored profiles; name and positions are session-only (reset on refresh).
+- **Search over real flight schedules**: Search endpoint returns mock list; no live schedule API.

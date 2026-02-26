@@ -14,6 +14,7 @@ class FlightStatus(str, Enum):
 
 class PredictionSchema(BaseModel):
     p_model_delay_30: float = Field(..., ge=0, le=1)
+    p_mkt: float = Field(..., ge=0, le=1)
     confidence: str = Field(..., pattern="^(LOW|MED|HIGH)$")
     reason_codes: list[str] = Field(default_factory=list)
 
@@ -47,3 +48,10 @@ class HistoryResponse(BaseModel):
     stats: HistoryStatsSchema
     sample_size: int
     period: str
+
+
+class SearchResultItem(BaseModel):
+    ident: str
+    route: str
+    status: str
+    departure_time: str

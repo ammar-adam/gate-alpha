@@ -7,6 +7,7 @@ export type FlightStatus =
 
 export interface Prediction {
   p_model_delay_30: number
+  p_mkt: number
   confidence: string
   reason_codes: string[]
 }
@@ -72,14 +73,11 @@ export async function getFlight(
     date: date.trim().slice(0, 10),
     mode: mode === 'live' ? 'live' : 'demo',
   })
-  const res = await fetch(`${BASE}/flight?${params}`)
+  const url = `${BASE}/flight?${params}`
+  const res = await fetch(url)
   if (!res.ok) {
-    let msg = `Flight lookup failed`
-    try {
-      const t = await res.text()
-      if (t && t.length < 200) msg = t
-    } catch {}
-    throw new Error(msg)
+    if (res.status === 404) throw new Error('NOT_FOUND')
+    throw new Error('ERROR')
   }
   const dataSource = (res.headers.get('X-Data-Source') ?? 'demo') as DataSource
   const flight = (await res.json()) as Flight
@@ -97,4 +95,16 @@ export function getHistory(
   })
   if (carrier?.trim()) params.set('carrier', carrier.trim())
   return getJson<History>(`${BASE}/history?${params}`)
+}
+
+export interface SearchResultItem {
+  ident: string
+  route: string
+  status: string
+  departure_time: string
+}
+
+export function getSearchResults(q: string): Promise<SearchResultItem[]> {
+  const params = new URLSearchParams({ q: q.trim() })
+  return getJson<SearchResultItem[]>(`${BASE}/search?${params}`)
 }
